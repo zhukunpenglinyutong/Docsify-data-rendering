@@ -1,0 +1,20 @@
+{
+  "name": "web",
+  "version": "1.0.0",
+  "description": "> 官方网址：https://docsify.js.org/#/zh-cn/more-pages",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "start": "docsify start .",
+    "deploy": "now -p"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "docsify-cli": "^4.3.0",
+    "now": "^15.0.3"
+  }
+}
