@@ -1,13 +1,17 @@
 (function () {
 
+  let docsifyDataStr = 'loding......'
+
   /**
-   * @说明 当用户点击
-   * 自己写的 阻断md数据，改为 api数据的地方
-   */
-  function setApiData () {
-    // 给一个数据源（可以是API，也可以是marker直接写的）
-    return '### 等待数据.....'
+   * @解释 再次执行渲染
+   * 现在的问题是我不太懂源码，导致用最笨的方法，就是重新创建一个Docsify对象的方法 | 可优化的地方太多了
+  */
+  function againInit (data = '等待数据......') {
+    console.log('重新执行')
+    docsifyDataStr = data
+    ready(function (_) { return new Docsify(); });
   }
+
 
   /**
    * Create a cached version of a pure function.
@@ -275,9 +279,9 @@
   }
   
   function on(el, type, handler) {
-    isFn(type) ?
-      window.addEventListener(el, type) :
-      el.addEventListener(type, handler);
+    // isFn(type) ?
+    //   window.addEventListener(el, type) :
+    //   el.addEventListener(type, handler);
   }
   
   function off(el, type, handler) {
@@ -361,7 +365,7 @@
         '') +
       '<div class="sidebar-nav"><!--sidebar--></div>' +
       '</aside>';
-  
+    aside = ''
     return (
       (isMobile ? (aside + "<main>") : ("<main>" + aside)) +
       '<section class="content">' +
@@ -482,7 +486,8 @@
     var cached$$1 = cache[url];
   
     if (cached$$1) {
-      return {then: function (cb) { return cb(cached$$1.content, cached$$1.opt); }, abort: noop}
+      // console.log('cached$$1', cached$$1)
+      // return {then: function (cb) { return cb(cached$$1.content, cached$$1.opt); }, abort: noop}
     }
   
     xhr.open('GET', url);
@@ -520,18 +525,20 @@
             error(target);
           } else {
             var result = (cache[url] = {
-              content: target.response,
+              content: docsifyDataStr,
               opt: {
                 updatedAt: xhr.getResponseHeader('last-modified')
               }
             });
-  
+            console.log('docsifyDataStr', docsifyDataStr)
+            // success(result.content, result.opt);
             success(result.content, result.opt);
           }
         });
       },
       abort: function (_) { return xhr.readyState !== 4 && xhr.abort(); }
     }
+
   }
   
   function replaceVar(block, color) {
@@ -4153,8 +4160,7 @@
   function prerenderEmbed(ref, done) {
     // console.log('ref', ref)
     var compiler = ref.compiler;
-    // var raw = ref.raw; if ( raw === void 0 ) raw = '';
-    var raw = setApiData()
+    var raw = ref.raw; if ( raw === void 0 ) raw = '';
     // console.log('raw', raw)
     // raw = '# 截断md数据，改为自定义数据\n```javascript\nlet a = 0;\n```'
     var fetch = ref.fetch;
@@ -4796,6 +4802,7 @@
     if (!path) {
       return
     }
+    console.log('执行渲染==============')
   
     get(
       vm.router.getFile(path + file) + qs,
@@ -5031,27 +5038,30 @@
   
   function initFetch(vm) {
     console.log(vm)
+    console.log('vm.rendered', vm.rendered)
     var ref = vm.config;
     var loadSidebar = ref.loadSidebar;
   
     // Server-Side Rendering
-    if (vm.rendered) {
-      var activeEl = getAndActive(vm.router, '.sidebar-nav', true, true);
-      if (loadSidebar && activeEl) {
-        activeEl.parentNode.innerHTML += window.__SUB_SIDEBAR__;
-      }
-      vm._bindEventOnRendered(activeEl);
-      vm.$resetEvents();
-      callHook(vm, 'doneEach');
-      callHook(vm, 'ready');
-    } else {
-      // 进到这里面了
+    // if (vm.rendered) {
+    //   var activeEl = getAndActive(vm.router, '.sidebar-nav', true, true);
+    //   if (loadSidebar && activeEl) {
+    //     activeEl.parentNode.innerHTML += window.__SUB_SIDEBAR__;
+    //   }
+    //   vm._bindEventOnRendered(activeEl);
+    //   vm.$resetEvents();
+    //   callHook(vm, 'doneEach');
+    //   callHook(vm, 'ready');
+    // } else {
+    //   // 进到这里面了
+    //   vm.$fetch(function (_) { return callHook(vm, 'ready'); });
+    // }
       vm.$fetch(function (_) { return callHook(vm, 'ready'); });
-    }
   }
   
   function initMixin(proto) {
     proto._init = function () {
+      console.log('创建，。。。。。')
       var vm = this;
       vm.config = config();
   
@@ -5065,6 +5075,7 @@
 
       initEvent(vm); // Bind events
       initFetch(vm); // Fetch data
+      console.log('触发 mounted')
       callHook(vm, 'mounted');
     };
   }
@@ -5100,6 +5111,7 @@
       util: util,
       dom: dom,
       get: get,
+      againInit: againInit,
       slugify: slugify,
       version: '4.9.1'
     };
@@ -5142,6 +5154,6 @@
    * Run Docsify
    */
   ready(function (_) { return new Docsify(); });
-  
+
   }());
   
